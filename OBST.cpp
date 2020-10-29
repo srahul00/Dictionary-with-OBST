@@ -5,7 +5,9 @@ using namespace std;
 
 class OBST
 {
+
 private:
+
     struct Node
     {
         string key;
@@ -29,6 +31,7 @@ private:
             left = right = NULL;
         }
     };
+    
     struct dpNode
     {
         long long cost;
@@ -90,7 +93,7 @@ private:
 
     Node *root;
     vector<string> meanings;
-    
+
 public:
     OBST()
     {
