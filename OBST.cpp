@@ -26,6 +26,7 @@ private:
         {
             key = s;
             meaning = m;
+            left = right = NULL;
         }
     };
     struct dpNode
@@ -62,16 +63,16 @@ private:
             t->right = add(key, t->right);
         return t; 
     }
-    Node* add(string key, string meaning, Node *t)
+    Node* add(const string &key, const string &meaning, Node *t)
     {
         if(t == NULL)
         {
             t = new Node(key, meaning);
         }
         else if(key < t->key)
-            t->left = add(key, t->left);
+            t->left = add(key, meaning, t->left);
         else
-            t->right = add(key, t->right);
+            t->right = add(key, meaning, t->right);
         return t; 
     }
 
@@ -89,11 +90,13 @@ private:
 
     Node *root;
     vector<string> meanings;
+    
 public:
     OBST()
     {
         root = NULL;
     }
+
     void createOBST(string filename)
     {
         fstream f;
@@ -111,6 +114,7 @@ public:
         f.close();
         createTree(strings, probs);
     }
+
     void createOBST(string filename, int meaningIncluded)
     {
         fstream f;
@@ -128,11 +132,13 @@ public:
             strings.push_back(word);
             probs.push_back(int(freq*1e5));
             meanings.push_back(string(meaning));
+            //cout<<word<<" "<<int(freq*1e5)<<" "<<meanings.back()<<endl;
         }
         f.close();
-        createTree(strings, probs);
+        createTree(strings, probs, meaningIncluded);
     }
-    void createTree(const vector<string> strings, const vector<long long> probs)
+
+    void createTree(const vector<string> strings, const vector<long long> probs, int meaning = 0)
     {
         int n = strings.size();
         vector<dpNode> matrix[n];
@@ -182,9 +188,9 @@ public:
 
             }
         }
-
-        insertTree(strings, matrix, 0, n-1, 1);
+        insertTree(strings, matrix, 0, n-1, meaning);
     }
+
     void insertTree(const vector<string> &strings, const vector<dpNode> table[], int i, int j, int meaning = 0)
     {   
         int index = table[i][j].root;
@@ -218,10 +224,12 @@ public:
             display(root->right);
         }
     }
+
     void disp()
     {
         display(root);
     }
+
     void search(string key)
     {
         Node *t = find(key, root);
@@ -287,6 +295,7 @@ int main()
     //getWords("count_big.txt", "words.txt", 3.0/100);
     OBST obj = OBST();
     obj.createOBST("Words_meaning.txt", 1);
-    obj.disp();
+    obj.search("fly");
+    //obj.disp();
     return 0;
 }
