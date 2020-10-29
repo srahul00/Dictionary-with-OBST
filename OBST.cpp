@@ -9,16 +9,23 @@ private:
     struct Node
     {
         string key;
+        string meaning;
         Node *left, *right;
         Node()
         {
             key = "";
+            meaning = "Meaning";
             left = right = NULL;
         }
-        Node(string s)
+        Node(const string s)
         {
             key = s;
             left = right = NULL;
+        }
+        Node(const string s, const string m)
+        {
+            key = s;
+            meaning = m;
         }
     };
     struct dpNode
@@ -55,6 +62,18 @@ private:
             t->right = add(key, t->right);
         return t; 
     }
+    Node* add(string key, string meaning, Node *t)
+    {
+        if(t == NULL)
+        {
+            t = new Node(key, meaning);
+        }
+        else if(key < t->key)
+            t->left = add(key, t->left);
+        else
+            t->right = add(key, t->right);
+        return t; 
+    }
 
     Node* find(string key, Node *t)
     {
@@ -69,6 +88,7 @@ private:
     }
 
     Node *root;
+    vector<string> meanings;
 public:
     OBST()
     {
@@ -77,7 +97,7 @@ public:
     void createOBST(string filename)
     {
         fstream f;
-        f.open("words.txt", ios::in);
+        f.open(filename, ios::in);
         vector<string> strings;
         vector<long long> probs;
         string word;
@@ -87,6 +107,27 @@ public:
             f>>word>>freq;
             strings.push_back(word);
             probs.push_back(int(freq*1e7));
+        }
+        f.close();
+        createTree(strings, probs);
+    }
+    void createOBST(string filename, int meaningIncluded)
+    {
+        fstream f;
+        f.open(filename, ios::in);
+        vector<string> strings;
+        vector<long long> probs;
+        string word;
+        long double freq;
+        while(!f.eof())
+        {
+            char meaning[85] = {'\0'};
+            char ch;
+            f>>word>>freq;
+            f.getline(meaning, 80, '\n');
+            strings.push_back(word);
+            probs.push_back(int(freq*1e5));
+            meanings.push_back(string(meaning));
         }
         f.close();
         createTree(strings, probs);
@@ -142,19 +183,27 @@ public:
             }
         }
 
-        insertTree(strings, matrix, 0, n-1);
+        insertTree(strings, matrix, 0, n-1, 1);
     }
-    void insertTree(const vector<string> &strings, const vector<dpNode> table[], int i, int j)
+    void insertTree(const vector<string> &strings, const vector<dpNode> table[], int i, int j, int meaning = 0)
     {   
         int index = table[i][j].root;
-        root = add(strings[index], root);
+        if(meaning)
+        {
+            root = add(strings[index], meanings[index], root);
+        }
+        else
+        {
+            root = add(strings[index], root);    
+        }
+        
         if(i <= index-1)
         {
-            insertTree(strings, table, i, index-1);
+            insertTree(strings, table, i, index-1, meaning);
         }
         if(j >= index+1)
         {
-            insertTree(strings, table, index+1, j);
+            insertTree(strings, table, index+1, j, meaning);
         }
     }
     
@@ -165,13 +214,25 @@ public:
         else 
         {
             display(root->left);
-            cout<<root->key<<endl;
+            cout<<root->key<<": "<<root->meaning<<endl;
             display(root->right);
         }
     }
     void disp()
     {
         display(root);
+    }
+    void search(string key)
+    {
+        Node *t = find(key, root);
+        if(t == NULL)
+        {
+            cout<<"Key not found!";
+        }
+        else 
+        {
+            cout<<t->key<<": "<<t->meaning<<endl;
+        }
     }
 
     ~OBST()
@@ -225,7 +286,7 @@ int main()
 {
     //getWords("count_big.txt", "words.txt", 3.0/100);
     OBST obj = OBST();
-    obj.createOBST("words.txt");
+    obj.createOBST("Words_meaning.txt", 1);
     obj.disp();
     return 0;
 }

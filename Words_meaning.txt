@@ -1,0 +1,10 @@
+nonplussed 0.01 Filled with bewilderment
+inchoate 0.06 Only partly in existence
+indefatigable 0.03 Sustained enthusiastic action
+uncanny 0.2 Surpassing the ordinary
+unabashed 0.15 Not embarassed
+dilatory 0.05 wasting time
+flute 0.05 An ornamental vertical groove in a column
+fly 0.2 Move quickly through air
+dire 0.05 Extremely serious
+maniac 0.2 Person exhibiting wild or violent behaviour
